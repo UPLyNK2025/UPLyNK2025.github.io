@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Tech Workshops</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+        }
+        
+        /* Background Slideshow */
+        .bg-slideshow {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-color: #add8e6;
+        }
+        
+        .bg-slide.active {
+            opacity: 0.9;
+        }
+        
+        /* Navigation Bar */
+        .nav-strip {
+            background: rgba(173, 216, 230, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        
+        .logo {
+            height: 45px;
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        
+        .nav-links > * {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 8px 0;
+            transition: all 0.3s;
+            position: relative;
+            display: inline-block;
+            font-size: 16px;
+        }
+        
+        .nav-links a:hover {
+            color: #0066cc;
+        }
+        
+        /* Dropdown Menu */
+        .has-dropdown {
+            position: relative;
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            min-width: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 0 0 8px 8px;
+            display: none;
+            animation: fadeIn 0.3s;
+            z-index: 1000;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-weight: 500;
+            border-bottom: 1px solid #f1f1f1;
+            transition: all 0.2s;
+        }
+        
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: #0066cc;
+            padding-left: 20px;
+        }
+        
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .has-dropdown:hover .dropdown,
+        .dropdown:hover,
+        .has-dropdown.active .dropdown {
+            display: block;
+        }
+        
+        /* Main Content */
+        .content-overlay {
+            background-color: rgba(255, 255, 255, 0.88);
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 30px;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .header-title {
+            font-size: 2.8rem;
+            color: #0a4b8c;
+            margin-bottom: 20px;
+        }
+        
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #2a5885;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        
+        .advantages-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .advantage-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .advantage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        
+        .advantage-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .advantage-content {
+            padding: 25px;
+        }
+        
+        .advantage-title {
+            font-size: 1.5rem;
+            color: #0a4b8c;
+            margin-bottom: 15px;
+        }
+        
+        .advantage-points {
+            color: #2a5885;
+            padding-left: 20px;
+        }
+        
+        .advantage-points li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 10px;
+        }
+        
+        .advantage-points li:before {
+            content: "•";
+            color: #0a4b8c;
+            font-size: 1.5rem;
+            position: absolute;
+            left: -15px;
+            top: -3px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-strip {
+                flex-direction: column;
+                padding: 15px 5%;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-links > * {
+                margin: 8px 15px;
+            }
+            
+            .header-title {
+                font-size: 2.2rem;
+            }
+            
+            .header-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .main-content {
+                padding: 40px 20px;
+            }
+            
+            .advantage-image {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Slideshow -->
+    <div class="bg-slideshow">
+        <div class="bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+        <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+    </div>
+    
+    <!-- Navigation Strip -->
+    <div class="nav-strip">
+        <img src="logo of sie.png" alt="Interactive Workshops Logo" class="logo">
+        <h1 align=left>UPLYNK</h1>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about us1.html">About Us</a>
+            <div class="has-dropdown" id="students-dropdown">
+                <a href="#" onclick="toggleDropdown('students-dropdown'); return false;">For Students</a>
+                <div class="dropdown">
+                    <a href="index1.html">Artificial Intelligence</a>
+                    <a href="index1.html">Blockchain</a>
+                    <a href="index1.html">Stock Market</a>
+                    <a href="index1.html">Personality Development</a>
+                    <a href="index1.html">Emotional Intelligence</a>
+                    <a href="index1.html">All in One</a>
+                </div>
+            </div>
+            <div class="has-dropdown" id="teachers-dropdown">
+                <a href="#" onclick="toggleDropdown('teachers-dropdown'); return false;">For Teachers</a>
+                <div class="dropdown">
+                    <a href="">Interactive Workshop</a>
+                </div>
+            </div>
+            <div class="has-dropdown" id="school-dropdown">
+                <a href="#" onclick="toggleDropdown('school-dropdown'); return false;">For School</a>
+                <div class="dropdown">
+                    <a href="For school.html">Contact for Collaboration</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-overlay">
+        <div class="main-content">
+            <div class="header-section">
+                <h1 class="header-title">Interactive Tech Workshops</h1>
+                <p class="header-subtitle">Empowering educators and students with cutting-edge technology through hands-on, interactive learning experiences that bridge the gap between traditional education and the digital future.</p>
+            </div>
+            
+            <div class="advantages-container">
+                <!-- Advantage 1 -->
+                <div class="advantage-card">
+                    <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Hands-on Learning" class="advantage-image">
+                    <div class="advantage-content">
+                        <h2 class="advantage-title">Hands-on Technology Experience</h2>
+                        <ul class="advantage-points">
+                            <li>Practical sessions with real-world tech applications</li>
+                            <li>Direct interaction with cutting-edge tools and platforms</li>
+                            <li>Learn by doing approach enhances retention</li>
+                            <li>Immediate application of concepts in lab environments</li>
+                            <li>Access to professional-grade equipment and software</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Advantage 2 -->
+                <div class="advantage-card">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Future Skills" class="advantage-image">
+                    <div class="advantage-content">
+                        <h2 class="advantage-title">Future-Ready Skill Development</h2>
+                        <ul class="advantage-points">
+                            <li>Master in-demand technologies like AI and blockchain</li>
+                            <li>Develop problem-solving and critical thinking skills</li>
+                            <li>Learn collaborative tools for team projects</li>
+                            <li>Understand ethical implications of new technologies</li>
+                            <li>Gain confidence in using professional development tools</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Advantage 3 -->
+                <div class="advantage-card">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Expert Guidance" class="advantage-image">
+                    <div class="advantage-content">
+                        <h2 class="advantage-title">Expert-Led Interactive Sessions</h2>
+                        <ul class="advantage-points">
+                            <li>Learn from industry professionals and tech experts</li>
+                            <li>Personalized feedback and guidance</li>
+                            <li>Q&A sessions with technology specialists</li>
+                            <li>Case studies from real-world implementations</li>
+                            <li>Networking opportunities with tech professionals</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Advantage 4 -->
+                <div class="advantage-card">
+                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Customized Learning" class="advantage-image">
+                    <div class="advantage-content">
+                        <h2 class="advantage-title">Customized Learning Pathways</h2>
+                        <ul class="advantage-points">
+                            <li>Tailored content for different skill levels</li>
+                            <li>Modular workshops that build on each other</li>
+                            <li>Flexible scheduling options</li>
+                            <li>Both individual and group learning formats</li>
+                            <li>Continuous updates with latest tech advancements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Background Slideshow Functionality
+        let currentBgSlide = 0;
+        const bgSlides = document.querySelectorAll('.bg-slide');
+        
+        function showBgSlide(n) {
+            bgSlides.forEach(slide => slide.classList.remove('active'));
+            bgSlides[n].classList.add('active');
+        }
+        
+        function nextBgSlide() {
+            currentBgSlide = (currentBgSlide + 1) % bgSlides.length;
+            showBgSlide(currentBgSlide);
+        }
+        
+        // Change slide every 5 seconds
+        setInterval(nextBgSlide, 5000);
+        
+        // Dropdown toggle functionality
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            dropdown.classList.toggle('active');
+            
+            // Close other dropdowns
+            document.querySelectorAll('.has-dropdown').forEach(item => {
+                if (item.id !== id) {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.has-dropdown')) {
+                document.querySelectorAll('.has-dropdown').forEach(item => {
+                    item.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

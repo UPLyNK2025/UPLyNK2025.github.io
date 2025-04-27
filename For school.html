@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Website</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+        }
+        
+        /* Background Slideshow */
+        .bg-slideshow {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-color: #add8e6;
+        }
+        
+        .bg-slide.active {
+            opacity: 1;
+        }
+        
+        /* Navigation Bar */
+        .nav-strip {
+            background: rgba(173, 216, 230, 0.85);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5%;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        
+        .logo {
+            height: 40px;
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        
+        .nav-links > * {
+            margin-left: 25px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 8px 0;
+            transition: all 0.3s;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .nav-links a:hover {
+            color: #0066cc;
+        }
+        
+        /* Dropdown Menu */
+        .has-dropdown {
+            position: relative;
+        }
+        
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            min-width: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s;
+            z-index: 1000;
+            margin-top: 8px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-weight: 500;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .dropdown a:hover {
+            background-color: #f8f9fa;
+            color: #0066cc;
+        }
+        
+        .dropdown a:last-child {
+            border-bottom: none;
+        }
+        
+        .has-dropdown:hover .dropdown,
+        .dropdown:hover {
+            display: block;
+        }
+        
+        /* Main Content */
+        .content-overlay {
+            background-color: rgba(255, 255, 255, 0.85);
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .courses-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px;
+        }
+        
+        .course-section {
+            background-color: #d9eaf7;
+            border-radius: 10px;
+            padding: 20px;
+            width: 45%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 1px solid #b6d4e8;
+            transition: all 0.3s;
+        }
+        
+        .course-title {
+            font-size: 24px;
+            color: #0a4b8c;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .price-box {
+            background-color: #e6f2ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 1px solid #b6d4e8;
+            color: #0a4b8c;
+        }
+        
+        .select-btn {
+            background-color: #0a4b8c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .select-btn:hover {
+            background-color: #1a6fc9;
+        }
+        
+        .features {
+            margin-top: 20px;
+            color: #2a5885;
+        }
+        
+        .features li {
+            margin-bottom: 10px;
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+            text-align: center;
+            color: #2a5885;
+            font-size: 14px;
+        }
+        
+        /* Payment Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .payment-modal {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            color: #0a4b8c;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background-color: #0a4b8c;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #1a6fc9;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-strip {
+                flex-direction: column;
+                padding: 15px 5%;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-links > * {
+                margin: 5px 10px;
+            }
+            
+            .courses-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .course-section {
+                width: 90%;
+                margin-bottom: 20px;
+            }
+            
+            .payment-modal {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Slideshow -->
+    <div class="bg-slideshow">
+        <div class="bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+        <div class="bg-slide" style="background-image: url('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1351&q=80');"></div>
+    </div>
+    
+    <!-- Navigation Strip -->
+    <div class="nav-strip">
+        <img src="logo of sie.png" alt="Logo" class="logo">
+        <h1 align=left>UPLYNK</h1>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about us1.html">About Us</a>
+            <div class="has-dropdown">
+                <a href="#">For Students</a>
+                <ul class="dropdown">
+                    <a href="index1.html">Artificial Intelligence</a>
+                    <a href="index1.html">Blockchain</a>
+                    <a href="index1.html">Stock Market</a>
+                    <a href="index1.html">Personality Development</a>
+                    <a href="index1.html">Emotional Intelligence</a>
+                    <a href="index1.html">All in One</a>
+                </ul>
+            </div>
+            <div class="has-dropdown">
+                <a href="#">For Teachers</a>
+                <ul class="dropdown">
+                    <a href="forteacher.html">Interactive Workshop</a>
+                </ul>
+            </div>
+            <div class="has-dropdown">
+                <a href="#">For School</a>
+                <ul class="dropdown">
+                    <a href="">Contact for Collaboration</a>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-overlay">
+        <div class="main-content">
+            <div class="courses-container">
+                <!-- Basic Course Section -->
+                <div class="course-section">
+                    <h2 class="course-title">Basic Course</h2>
+                    <div class="price-box">₹8.5 Lakhs per annum</div>
+                    
+                    <div class="features">
+                        <ul>
+                            <li>Standard curriculum integration for digital learning</li>
+                            <li>Bi-annual teacher training workshops</li>
+                            <li>Basic student assessment and analytics</li>
+                            <li>Online resource portal with standard content</li>
+                            <li>Quarterly academic progress reports</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="select-btn" onclick="openModal('Basic Course', '₹8.5 Lakhs per annum')">Select & Pay</button>
+                    
+                    <div class="contact-info">
+                        <strong>Contact for more details:</strong> +91 01204312985
+                    </div>
+                </div>
+                
+                <!-- Enterprise Course Section -->
+                <div class="course-section">
+                    <h2 class="course-title">Enterprise Course</h2>
+                    <div class="price-box">₹13.25 Lakhs per annum</div>
+                    
+                    <div class="features">
+                        <ul>
+                            <li>Premium customizable curriculum with advanced modules</li>
+                            <li>Monthly teacher training and continuous support</li>
+                            <li>Comprehensive student analytics dashboard</li>
+                            <li>Dedicated account manager for your institution</li>
+                            <li>Priority 24/7 technical support</li>
+                            <li>Interactive parent engagement portal</li>
+                            <li>Detailed monthly progress reports with actionable insights</li>
+                            <li>Customized learning paths for students</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="select-btn" onclick="openModal('Enterprise Course', '₹13.25 Lakhs per annum')">Select & Pay</button>
+                    
+                    <div class="contact-info">
+                        <strong>Contact for more details:</strong> +91 01204312985
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="payment-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Form</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="courseName">Selected Course</label>
+                    <input type="text" id="courseName" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="schoolName">School Name *</label>
+                    <input type="text" id="schoolName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Query *</label>
+                    <textarea id="address" required></textarea>
+                
+                <button type="submit" class="submit-btn">Submit your Response</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Background Slideshow Functionality
+        let currentBgSlide = 0;
+        const bgSlides = document.querySelectorAll('.bg-slide');
+        
+        function showBgSlide(n) {
+            bgSlides.forEach(slide => slide.classList.remove('active'));
+            bgSlides[n].classList.add('active');
+        }
+        
+        function nextBgSlide() {
+            currentBgSlide = (currentBgSlide + 1) % bgSlides.length;
+            showBgSlide(currentBgSlide);
+        }
+        
+        // Change slide every 5 seconds
+        setInterval(nextBgSlide, 5000);
+        
+        // Modal functionality
+        function openModal(courseName, coursePrice) {
+            document.getElementById('courseName').value = courseName;
+            document.getElementById('paymentModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+        
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+        
+        // Form submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thanks for showing intrest! Our team will contact you shortly.');
+            closeModal();
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('paymentModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+
+</body>
+</html>
